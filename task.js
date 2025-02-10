@@ -51,41 +51,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // Section display handler
     function showSection(sectionId) {
         // Hide all sections
-        [welcomeSection, tasksSection, taskManagementSection, taskReportsSection, hrSection]
-            .forEach(section => {
-                if (section) section.style.display = 'none';
-            });
-
-        // Remove active class from all menu items
-        menuItems.forEach(item => item.classList.remove('active'));
-
-        // Add active class to clicked item
-        const activeItem = document.querySelector(`[data-section="${sectionId}"]`);
-        if (activeItem) activeItem.classList.add('active');
+        document.querySelectorAll('section').forEach(section => {
+            section.style.display = 'none';
+        });
 
         // Show selected section
-        switch(sectionId) {
-            case 'welcome':
-                if (welcomeSection) welcomeSection.style.display = 'block';
-                break;
-            case 'tasks':
-                if (tasksSection) {
-                    tasksSection.style.display = 'block';
-                    loadMyTasks();
-                }
-                break;
-            case 'taskManagement':
-                if (taskManagementSection) {
-                    taskManagementSection.style.display = 'block';
-                    loadAllTasks();
-                }
-                break;
-            case 'taskReports':
-                if (taskReportsSection) taskReportsSection.style.display = 'block';
-                break;
-            case 'hr':
-                if (hrSection) hrSection.style.display = 'block';
-                break;
+        const selectedSection = document.getElementById(sectionId + 'Section');
+        if (selectedSection) {
+            selectedSection.style.display = 'block';
+        }
+
+        // Update active menu item
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        const activeItem = document.querySelector(`[data-section="${sectionId}"]`);
+        if (activeItem) {
+            activeItem.classList.add('active');
         }
     }
 

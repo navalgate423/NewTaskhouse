@@ -82,124 +82,155 @@
         </div>
 
         <!-- Welcome Section -->
-        <div class="welcome-section" id="welcomeSection">
-            <div class="welcome-container">
-                <!-- Remove or comment out the centered logo if it exists -->
-                <div class="welcome-header">
-                    <h1>Welcome to Virtual BizNest</h1>
-                    <p class="subtitle">Your Digital Workspace for Enhanced Productivity</p>
+        <section class="welcome-section" id="welcomeSection">
+            <div class="welcome-header">
+                <div class="welcome-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="welcome-text">
+                    <h1>Welcome back, John!</h1>
+                    <p>Here's an overview of your tasks for today</p>
+                </div>
+            </div>
+
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>12</h3>
+                        <p>Total Tasks</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>5</h3>
+                        <p>In Progress</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>7</h3>
+                        <p>Completed</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>2</h3>
+                        <p>Due Today</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="recent-activities">
+                <h2>Recent Activities</h2>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="activity-details">
+                            <h4>New Task Assigned</h4>
+                            <p>Website Development Project</p>
+                            <span class="activity-time">2 hours ago</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="activity-details">
+                            <h4>Task Completed</h4>
+                            <p>UI Design Updates</p>
+                            <span class="activity-time">5 hours ago</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="activity-details">
+                            <h4>New Comment</h4>
+                            <p>On Mobile App Project</p>
+                            <span class="activity-time">1 day ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- My Tasks Section (Initially Hidden) -->
+        <section class="tasks-section" id="tasksSection" style="display: none;">
+            <div class="tasks-header">
+                <h2>My Tasks</h2>
+                <button class="action-btn" onclick="openTaskModal()">
+                    <i class="fas fa-plus"></i>
+                    Add New Task
+                </button>
+            </div>
+
+            <div class="search-filter-section">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search tasks...">
                 </div>
                 
-                <!-- Rest of welcome content -->
-                <div class="stats-overview">
-                    <div class="stat-item">
-                        <i class="fas fa-clock"></i>
-                        <div class="stat-details">
-                            <h3>Today's Tasks</h3>
-                            <p>5 Pending</p>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-calendar-check"></i>
-                        <div class="stat-details">
-                            <h3>This Week</h3>
-                            <p>12 Tasks</p>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-star"></i>
-                        <div class="stat-details">
-                            <h3>Priority Tasks</h3>
-                            <p>3 High Priority</p>
-                        </div>
-                    </div>
-                </div>
+                <select class="filter-dropdown" id="taskFilterPriority">
+                    <option value="all">All Priorities</option>
+                    <option value="high">High Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="low">Low Priority</option>
+                </select>
 
-                <!-- Quick Actions -->
-                <div class="quick-actions-grid">
-                    <div class="action-card">
-                        <i class="fas fa-tasks"></i>
-                        <h3>Task Management</h3>
-                        <p>View and monitor your tasks</p>
-                        <a href="#" class="action-btn" data-section="taskManagement">
-                            View All Tasks
-                        </a>
-                    </div>
-                    <div class="action-card">
-                        <i class="fas fa-chart-line"></i>
-                        <h3>Performance</h3>
-                        <p>Track your productivity metrics</p>
-                        <button class="action-btn">View Stats</button>
-                    </div>
-                    <div class="action-card">
-                        <i class="fas fa-users"></i>
-                        <h3>Team Updates</h3>
-                        <p>Stay connected with your team</p>
-                        <button class="action-btn">View Team</button>
-                    </div>
-                    <div class="action-card">
-                        <i class="fas fa-book"></i>
-                        <h3>Resources</h3>
-                        <p>Access training and documentation</p>
-                        <button class="action-btn">View Resources</button>
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="recent-activity">
-                    <h2>Recent Activity</h2>
-                    <div class="activity-timeline">
-                        <div class="activity-item">
-                            <div class="activity-icon"><i class="fas fa-plus-circle"></i></div>
-                            <div class="activity-content">
-                                <h4>New Task Created</h4>
-                                <p>Website Development Phase 2</p>
-                                <span class="time">2 hours ago</span>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon"><i class="fas fa-check-circle"></i></div>
-                            <div class="activity-content">
-                                <h4>Task Completed</h4>
-                                <p>Client Meeting Notes</p>
-                                <span class="time">Yesterday</span>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon"><i class="fas fa-comment"></i></div>
-                            <div class="activity-content">
-                                <h4>New Comment</h4>
-                                <p>On Project Timeline</p>
-                                <span class="time">2 days ago</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <select class="filter-dropdown" id="taskFilterStatus">
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
             </div>
-        </div>
 
-        <!-- My Tasks Section -->
-        <div class="tasks-section" id="tasksSection" style="display: none;">
-            <div class="task-list-container">
-                <div class="task-list-header">
-                    <h2>My Tasks</h2>
-                    <button class="add-task-btn" onclick="openTaskModal()">
-                        <i class="fas fa-plus"></i> Add New Task
+            <!-- Task Cards Container -->
+            <div class="task-cards-container" id="myTasks">
+                <!-- Tasks will be dynamically inserted here -->
+                
+                <!-- Example of an empty state -->
+                <div class="empty-tasks" style="display: none;">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>No Tasks Found</h3>
+                    <p>Create your first task to get started</p>
+                    <button class="action-btn" onclick="openTaskModal()">
+                        <i class="fas fa-plus"></i>
+                        Add New Task
                     </button>
-                    <div class="task-filters">
-                        <select id="taskFilterPriority">
-                            <option value="all">All Priority</option>
-                            <option value="high">High Priority</option>
-                            <option value="medium">Medium Priority</option>
-                            <option value="low">Low Priority</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="tasks-grid" id="myTasks">
-                    <!-- Personal tasks will be added here -->
                 </div>
             </div>
-        </div>
+
+            <!-- Task Progress Section -->
+            <div class="task-progress">
+                <div class="progress-header">
+                    <h3>Overall Progress</h3>
+                    <span>58% Completed</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 58%;"></div>
+                </div>
+            </div>
+        </section>
 
         <!-- Task Management Section (View Only) -->
         <div class="task-management-section" id="taskManagementSection" style="display: none;">
@@ -265,93 +296,57 @@
                 </div>
             </div>
         </div>
-
-        <div class="recent-activities">
-            <h2>Recent Activities</h2>
-            <div class="activity-list">
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <div class="activity-details">
-                        <h4>New Task Assigned</h4>
-                        <p>Website Development Project</p>
-                        <span class="activity-time">2 hours ago</span>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <div class="activity-details">
-                        <h4>Task Completed</h4>
-                        <p>UI Design Updates</p>
-                        <span class="activity-time">5 hours ago</span>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-comment"></i>
-                    </div>
-                    <div class="activity-details">
-                        <h4>New Comment</h4>
-                        <p>On Mobile App Project</p>
-                        <span class="activity-time">1 day ago</span>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Task Modal -->
     <div id="taskModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-plus-circle"></i> Create New Task</h2>
+                <h2>Add New Task</h2>
                 <span class="close-modal">&times;</span>
             </div>
+            
             <form id="taskForm">
                 <div class="form-group">
-                    <label for="taskTitle">
-                        <i class="fas fa-heading"></i> Task Title
-                    </label>
-                    <input type="text" id="taskTitle" placeholder="Enter task title" required>
+                    <label for="taskTitle">Task Title</label>
+                    <input type="text" id="taskTitle" required>
                 </div>
-                
+
                 <div class="form-group">
-                    <label for="taskDescription">
-                        <i class="fas fa-align-left"></i> Description
-                    </label>
-                    <textarea id="taskDescription" placeholder="Enter task description" rows="4"></textarea>
+                    <label for="taskDescription">Description</label>
+                    <textarea id="taskDescription" rows="3"></textarea>
                 </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="taskPriority">
-                            <i class="fas fa-flag"></i> Priority
-                        </label>
-                        <select id="taskPriority" required>
-                            <option value="">Select Priority</option>
-                            <option value="high">High Priority</option>
-                            <option value="medium">Medium Priority</option>
-                            <option value="low">Low Priority</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="taskDueDate">
-                            <i class="fas fa-calendar"></i> Due Date
-                        </label>
-                        <input type="date" id="taskDueDate" required>
-                    </div>
+
+                <div class="form-group">
+                    <label for="taskPriority">Priority</label>
+                    <select id="taskPriority" required>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
                 </div>
-                
+
+                <div class="form-group">
+                    <label for="taskCategory">Category</label>
+                    <select id="taskCategory" required>
+                        <option value="work">Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="health">Health</option>
+                        <option value="education">Education</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="taskDueDate">Due Date</label>
+                    <input type="date" id="taskDueDate" required>
+                </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="btn-cancel">
-                        <i class="fas fa-times"></i> Cancel
-                    </button>
+                    <button type="button" class="btn-cancel">Cancel</button>
                     <button type="submit" class="btn-submit">
-                        <i class="fas fa-check"></i> Create Task
+                        <i class="fas fa-plus"></i>
+                        Add Task
                     </button>
                 </div>
             </form>
