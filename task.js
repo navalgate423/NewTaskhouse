@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize tasks array
+    // Initialize tasks array from localStorage
     let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
     // Get all sections
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get menu elements
     const operationMenu = document.querySelector('.has-submenu');
     const submenu = document.querySelector('.submenu');
-    const menuItems = document.querySelectorAll('.menu-item:not(.has-submenu)');
+    const menuItems = document.querySelectorAll('.menu-item:not(.has-submenu), .submenu-item');
 
     // Add new elements
     const searchInput = document.querySelector('.search-bar input');
@@ -29,6 +29,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const taskCategories = [
         'Work', 'Personal', 'Shopping', 'Health', 'Finance', 'Education', 'Other'
     ];
+
+    // Load tasks immediately when page loads
+    loadMyTasks();
 
     // Operation submenu toggle
     if (operationMenu && submenu) {
@@ -44,6 +47,13 @@ document.addEventListener('DOMContentLoaded', function() {
         item.onclick = function(e) {
             e.preventDefault();
             const sectionToShow = this.getAttribute('data-section');
+            
+            // Remove active class from all menu items
+            menuItems.forEach(menuItem => menuItem.classList.remove('active'));
+            
+            // Add active class to clicked item
+            this.classList.add('active');
+            
             showSection(sectionToShow);
         };
     });
@@ -59,15 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedSection = document.getElementById(sectionId + 'Section');
         if (selectedSection) {
             selectedSection.style.display = 'block';
-        }
-
-        // Update active menu item
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        const activeItem = document.querySelector(`[data-section="${sectionId}"]`);
-        if (activeItem) {
-            activeItem.classList.add('active');
         }
     }
 
@@ -99,111 +100,70 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Enhanced task loading with filters and search
+    // Function to load tasks
     function loadMyTasks() {
         if (!myTasksContainer) return;
 
-        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-        const priorityFilter = document.getElementById('taskFilterPriority').value;
-        const statusFilter = taskFilterStatus.value;
-        const sortOption = taskSortSelect.value;
+        // Get tasks from localStorage
+        tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
-        let filteredTasks = tasks.filter(task => {
-            const matchesSearch = task.title.toLowerCase().includes(searchTerm) ||
-                                task.description.toLowerCase().includes(searchTerm);
-            const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
-            const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
-            
-            return matchesSearch && matchesPriority && matchesStatus;
-        });
-
-        // Sort tasks
-        filteredTasks.sort((a, b) => {
-            switch(sortOption) {
-                case 'date-asc':
-                    return new Date(a.dueDate) - new Date(b.dueDate);
-                case 'date-desc':
-                    return new Date(b.dueDate) - new Date(a.dueDate);
-                case 'priority-high':
-                    return getPriorityWeight(b.priority) - getPriorityWeight(a.priority);
-                case 'priority-low':
-                    return getPriorityWeight(a.priority) - getPriorityWeight(b.priority);
-                default:
-                    return 0;
-            }
-        });
-
-        // Render tasks
-        myTasksContainer.innerHTML = '';
-        if (filteredTasks.length === 0) {
-            myTasksContainer.innerHTML = '<div class="no-tasks">No tasks found</div>';
+        if (tasks.length === 0) {
+            myTasksContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-tasks"></i>
+                    <h3>No tasks yet</h3>
+                    <p>Add your first task to get started</p>
+                </div>
+            `;
             return;
         }
 
-        filteredTasks.forEach(task => {
-            const taskElement = createTaskElement(task, true);
+        myTasksContainer.innerHTML = '';
+        tasks.forEach(task => {
+            const taskElement = createTaskElement(task);
             myTasksContainer.appendChild(taskElement);
         });
 
         updateTaskStats();
     }
 
-    // Priority weight helper
-    function getPriorityWeight(priority) {
-        const weights = { high: 3, medium: 2, low: 1 };
-        return weights[priority] || 0;
-    }
-
     // Create task element
-    function createTaskElement(task, editable = true) {
+    function createTaskElement(task) {
         const div = document.createElement('div');
         div.className = `task-card ${task.status}`;
         div.dataset.taskId = task.id;
-        div.dataset.priority = task.priority;
-        
-        if (editable) {
-            div.setAttribute('draggable', true);
-        }
         
         div.innerHTML = `
-            <div class="task-header">
-                <span class="task-priority ${task.priority}">
-                    ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                </span>
-                <div class="task-category">${task.category || 'Uncategorized'}</div>
-                ${editable ? `
-                    <div class="priority-menu">
-                        <button class="priority-toggle">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                        <div class="priority-dropdown">
-                            <button onclick="updateTaskPriority(${task.id}, 'high')">High Priority</button>
-                            <button onclick="updateTaskPriority(${task.id}, 'medium')">Medium Priority</button>
-                            <button onclick="updateTaskPriority(${task.id}, 'low')">Low Priority</button>
-                        </div>
+            <div class="task-content">
+                <div class="task-header">
+                    <span class="task-priority ${task.priority}">
+                        ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                    </span>
+                    <div class="task-category">${task.category || 'Uncategorized'}</div>
+                </div>
+                <h3 class="task-title">${task.title}</h3>
+                <p class="task-description">${task.description || 'No description'}</p>
+                <div class="task-meta">
+                    <div class="task-due-date">
+                        <i class="far fa-calendar"></i>
+                        <span>${formatDate(task.dueDate)}</span>
                     </div>
-                ` : ''}
+                    <div class="task-status">
+                        <i class="fas fa-circle"></i>
+                        <span>${task.status}</span>
+                    </div>
+                </div>
             </div>
-            <h3 class="task-title">${task.title}</h3>
-            <p class="task-description">${task.description || 'No description'}</p>
-            <div class="task-meta">
-                <span class="task-date ${isOverdue(task.dueDate) ? 'overdue' : ''}">
-                    Due: ${formatDate(task.dueDate)}
-                </span>
-                <span class="task-status">${task.status}</span>
-                ${editable ? `
-                    <div class="task-actions">
-                        <button class="task-action-btn status" onclick="updateTaskStatus(${task.id})">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                        <button class="task-action-btn edit" onclick="editTask(${task.id})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="task-action-btn delete" onclick="deleteTask(${task.id})">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-                ` : ''}
+            <div class="task-actions">
+                <button class="task-action-btn" onclick="updateTaskStatus('${task.id}')">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="task-action-btn" onclick="editTask('${task.id}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="task-action-btn" onclick="deleteTask('${task.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
         `;
         
@@ -294,29 +254,19 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             
             const newTask = {
-                id: Date.now(),
+                id: Date.now().toString(),
                 title: document.getElementById('taskTitle').value,
                 description: document.getElementById('taskDescription').value,
                 priority: document.getElementById('taskPriority').value,
                 dueDate: document.getElementById('taskDueDate').value,
                 category: document.getElementById('taskCategory').value,
                 status: 'pending',
-                progress: 0,
-                checklist: [],
-                collaborators: Array.from(document.querySelectorAll('input[name="collaborators"]:checked'))
-                    .map(input => parseInt(input.value)),
-                reminder: document.querySelector('.reminder-time').value,
-                comments: [],
                 createdAt: new Date().toISOString()
             };
 
             tasks.push(newTask);
             localStorage.setItem('tasks', JSON.stringify(tasks));
             
-            if (newTask.reminder) {
-                scheduleReminder(newTask);
-            }
-
             loadMyTasks();
             closeModal();
             showNotification('New task created successfully');
@@ -333,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Update task status cycle
+    // Update task status
     window.updateTaskStatus = function(taskId) {
         const statusCycle = ['pending', 'in-progress', 'completed'];
         const task = tasks.find(t => t.id === taskId);
@@ -346,22 +296,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Edit task
+    // Edit task function
     window.editTask = function(taskId) {
         const task = tasks.find(t => t.id === taskId);
         if (task && taskModal) {
-            // Fill form with task data
             document.getElementById('taskTitle').value = task.title;
             document.getElementById('taskDescription').value = task.description;
             document.getElementById('taskPriority').value = task.priority;
             document.getElementById('taskDueDate').value = task.dueDate;
             document.getElementById('taskCategory').value = task.category || '';
             
-            // Update form submission handler
             taskForm.onsubmit = function(e) {
                 e.preventDefault();
                 
-                // Update task
                 task.title = document.getElementById('taskTitle').value;
                 task.description = document.getElementById('taskDescription').value;
                 task.priority = document.getElementById('taskPriority').value;
@@ -372,52 +319,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadMyTasks();
                 closeModal();
                 showNotification('Task updated successfully');
-                
-                // Reset form submission to normal
-                initializeTaskForm();
             };
             
             taskModal.style.display = 'block';
         }
     };
-
-    // Initialize task form for new tasks
-    function initializeTaskForm() {
-        if (taskForm) {
-            taskForm.onsubmit = function(e) {
-                e.preventDefault();
-                
-                const newTask = {
-                    id: Date.now(),
-                    title: document.getElementById('taskTitle').value,
-                    description: document.getElementById('taskDescription').value,
-                    priority: document.getElementById('taskPriority').value,
-                    dueDate: document.getElementById('taskDueDate').value,
-                    category: document.getElementById('taskCategory').value,
-                    status: 'pending',
-                    progress: 0,
-                    checklist: [],
-                    collaborators: Array.from(document.querySelectorAll('input[name="collaborators"]:checked'))
-                        .map(input => parseInt(input.value)),
-                    reminder: document.querySelector('.reminder-time').value,
-                    comments: [],
-                    createdAt: new Date().toISOString()
-                };
-
-                tasks.push(newTask);
-                localStorage.setItem('tasks', JSON.stringify(tasks));
-                
-                if (newTask.reminder) {
-                    scheduleReminder(newTask);
-                }
-
-                loadMyTasks();
-                closeModal();
-                this.reset();
-                showNotification('New task created successfully');
-            };
-        }
-    }
 
     // Notification system
     function showNotification(message) {

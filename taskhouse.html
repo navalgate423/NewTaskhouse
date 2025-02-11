@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="task.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="task.js" defer></script>
     <title>TaskHouse</title>
 </head>
@@ -36,11 +36,11 @@
                 <i class="fas fa-chevron-down submenu-icon"></i>
             </div>
             <div class="submenu">
-                <a href="#" class="menu-item" data-section="taskReports">
+                <a href="#" class="submenu-item" data-section="taskReports">
                     <i class="fas fa-chart-bar"></i>
                     <span>Task Reports</span>
                 </a>
-                <a href="#" class="menu-item" data-section="vaUtilization">
+                <a href="#" class="submenu-item" data-section="vaUtilization">
                     <i class="fas fa-user-clock"></i>
                     <span>VA Utilization</span>
                 </a>
@@ -177,9 +177,9 @@
         <section class="tasks-section" id="tasksSection" style="display: none;">
             <div class="tasks-header">
                 <h2>My Tasks</h2>
-                <button class="action-btn" onclick="openTaskModal()">
+                <button class="add-task-btn" onclick="openTaskModal()">
                     <i class="fas fa-plus"></i>
-                    Add New Task
+                    <span>Add New Task</span>
                 </button>
             </div>
 
@@ -213,9 +213,8 @@
                     <i class="fas fa-clipboard-list"></i>
                     <h3>No Tasks Found</h3>
                     <p>Create your first task to get started</p>
-                    <button class="action-btn" onclick="openTaskModal()">
+                    <button class="add-task-btn" onclick="openTaskModal()">
                         <i class="fas fa-plus"></i>
-                        Add New Task
                     </button>
                 </div>
             </div>
@@ -251,51 +250,199 @@
             </div>
         </div>
 
-        <div class="task-reports-section" id="taskReportsSection" style="display: none;">
+        <!-- Task Reports Section -->
+        <section class="task-reports-section" id="taskReportsSection" style="display: none;">
             <div class="reports-container">
-                <h2>Task Reports</h2>
-                <div class="report-filters">
-                    <select id="reportDateFilter">
-                        <option value="today">Today</option>
-                        <option value="week">This Week</option>
-                        <option value="month">This Month</option>
-                        <option value="custom">Custom Range</option>
-                    </select>
+                <div class="section-header">
+                    <h2>Task Reports</h2>
+                    <div class="report-filters">
+                        <select id="reportDateFilter" class="filter-dropdown">
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                        <button class="action-btn">
+                            <i class="fas fa-download"></i>
+                            Export Report
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="report-summary">
                     <div class="summary-card">
-                        <h3>Completed Tasks</h3>
-                        <div class="summary-count" id="completedTasksCount">0</div>
+                        <div class="summary-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="summary-details">
+                            <h3>Completed Tasks</h3>
+                            <div class="summary-count" id="completedTasksCount">24</div>
+                            <p class="summary-trend positive">
+                                <i class="fas fa-arrow-up"></i> 12% from last week
+                            </p>
+                        </div>
                     </div>
+                    
                     <div class="summary-card">
-                        <h3>Total Hours</h3>
-                        <div class="summary-count" id="totalHours">0</div>
+                        <div class="summary-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="summary-details">
+                            <h3>Total Hours</h3>
+                            <div class="summary-count" id="totalHours">156</div>
+                            <p class="summary-trend">
+                                <i class="fas fa-minus"></i> Same as last week
+                            </p>
+                        </div>
                     </div>
+                    
                     <div class="summary-card">
-                        <h3>Average Completion Time</h3>
-                        <div class="summary-count" id="avgCompletionTime">0</div>
+                        <div class="summary-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="summary-details">
+                            <h3>Productivity Rate</h3>
+                            <div class="summary-count" id="productivityRate">85%</div>
+                            <p class="summary-trend positive">
+                                <i class="fas fa-arrow-up"></i> 5% from last week
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="completed-tasks-list">
-                    <h3>Completed Tasks Details</h3>
-                    <table class="tasks-table">
-                        <thead>
-                            <tr>
-                                <th>Task Title</th>
-                                <th>Priority</th>
-                                <th>Completion Date</th>
-                                <th>Time Spent</th>
-                            </tr>
-                        </thead>
-                        <tbody id="completedTasksTable">
-                            <!-- Tasks will be dynamically added here -->
-                        </tbody>
-                    </table>
+                <div class="report-details">
+                    <div class="report-table-header">
+                        <h3>Task Completion Details</h3>
+                        <div class="table-filters">
+                            <input type="text" placeholder="Search tasks..." class="search-input">
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="tasks-table">
+                            <thead>
+                                <tr>
+                                    <th>Task Name</th>
+                                    <th>Assigned To</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Time Spent</th>
+                                </tr>
+                            </thead>
+                            <tbody id="taskReportTable">
+                                <!-- Sample data -->
+                                <tr>
+                                    <td>Website Redesign</td>
+                                    <td>John Doe</td>
+                                    <td>Oct 15, 2023</td>
+                                    <td><span class="status-badge completed">Completed</span></td>
+                                    <td>24h 30m</td>
+                                </tr>
+                                <tr>
+                                    <td>Content Writing</td>
+                                    <td>Jane Smith</td>
+                                    <td>Oct 16, 2023</td>
+                                    <td><span class="status-badge in-progress">In Progress</span></td>
+                                    <td>12h 45m</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- VA Utilization Section -->
+        <section class="va-utilization-section" id="vaUtilizationSection" style="display: none;">
+            <div class="utilization-container">
+                <div class="section-header">
+                    <h2>VA Utilization</h2>
+                    <div class="utilization-filters">
+                        <select id="teamFilter" class="filter-dropdown">
+                            <option value="all">All Teams</option>
+                            <option value="development">Development</option>
+                            <option value="design">Design</option>
+                            <option value="marketing">Marketing</option>
+                        </select>
+                        <button class="action-btn">
+                            <i class="fas fa-file-export"></i>
+                            Export Data
+                        </button>
+                    </div>
+                </div>
+
+                <div class="utilization-summary">
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="summary-details">
+                            <h3>Active VAs</h3>
+                            <div class="summary-count">12</div>
+                            <p class="summary-trend positive">
+                                <i class="fas fa-arrow-up"></i> 2 new this month
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="summary-details">
+                            <h3>Average Utilization</h3>
+                            <div class="summary-count">78%</div>
+                            <p class="summary-trend positive">
+                                <i class="fas fa-arrow-up"></i> 5% increase
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="summary-details">
+                            <h3>Total Hours</h3>
+                            <div class="summary-count">960</div>
+                            <p class="summary-trend">
+                                <i class="fas fa-minus"></i> This month
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="va-details">
+                    <div class="va-grid">
+                        <!-- VA Cards -->
+                        <div class="va-card">
+                            <div class="va-header">
+                                <img src="images/newlogo.png" alt="VA Avatar">
+                                <div class="va-info">
+                                    <h4>John Doe</h4>
+                                    <p>Development Team</p>
+                                </div>
+                                <div class="utilization-badge high">85%</div>
+                            </div>
+                            <div class="va-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Tasks Completed</span>
+                                    <span class="stat-value">45</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Hours Logged</span>
+                                    <span class="stat-value">160h</span>
+                                </div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Add more VA cards as needed -->
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
     <!-- Task Modal -->
@@ -303,51 +450,65 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Add New Task</h2>
-                <span class="close-modal">&times;</span>
+                <button class="close-modal" onclick="closeTaskModal()">&times;</button>
             </div>
-            
             <form id="taskForm">
-                <div class="form-group">
-                    <label for="taskTitle">Task Title</label>
-                    <input type="text" id="taskTitle" required>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="taskTitle">Task Title</label>
+                        <input type="text" id="taskTitle" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDescription">Description</label>
+                        <textarea id="taskDescription" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskPriority">Priority</label>
+                        <select id="taskPriority" class="form-control" required>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskCategory">Category</label>
+                        <select id="taskCategory" class="form-control" required>
+                            <option value="work">Work</option>
+                            <option value="personal">Personal</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="health">Health</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDueDate">Due Date</label>
+                        <input type="date" id="taskDueDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Assign To:</label>
+                        <div class="assign-options">
+                            <label class="assign-option">
+                                <input type="checkbox" name="assignTo" value="johnDoe">
+                                <span>John Doe</span>
+                            </label>
+                            <label class="assign-option">
+                                <input type="checkbox" name="assignTo" value="janeSmith">
+                                <span>Jane Smith</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskReminder">Set Reminder:</label>
+                        <select id="taskReminder" class="form-control">
+                            <option value="none">No Reminder</option>
+                            <option value="15">15 minutes before</option>
+                            <option value="30">30 minutes before</option>
+                            <option value="60">1 hour before</option>
+                        </select>
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="taskDescription">Description</label>
-                    <textarea id="taskDescription" rows="3"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="taskPriority">Priority</label>
-                    <select id="taskPriority" required>
-                        <option value="high">High</option>
-                        <option value="medium">Medium</option>
-                        <option value="low">Low</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="taskCategory">Category</label>
-                    <select id="taskCategory" required>
-                        <option value="work">Work</option>
-                        <option value="personal">Personal</option>
-                        <option value="shopping">Shopping</option>
-                        <option value="health">Health</option>
-                        <option value="education">Education</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="taskDueDate">Due Date</label>
-                    <input type="date" id="taskDueDate" required>
-                </div>
-
                 <div class="modal-footer">
-                    <button type="button" class="btn-cancel">Cancel</button>
-                    <button type="submit" class="btn-submit">
-                        <i class="fas fa-plus"></i>
-                        Add Task
-                    </button>
+                    <button type="button" class="btn btn-cancel" onclick="closeTaskModal()">Cancel</button>
+                    <button type="submit" class="btn btn-submit">Add Task</button>
                 </div>
             </form>
         </div>
