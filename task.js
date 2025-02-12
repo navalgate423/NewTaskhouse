@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add new elements
     const searchInput = document.querySelector('.search-bar input');
-    const taskFilterStatus = document.createElement('select');
+    const taskFilterStatus = document.createElement('select');  
     const taskSortSelect = document.createElement('select');
 
     // Add task categories
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTaskStats();
     }
 
-    // Create task element
+    // Function to create task element
     function createTaskElement(task) {
         const div = document.createElement('div');
         div.className = `task-card ${task.status}`;
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="task-content">
                 <div class="task-header">
                     <span class="task-priority ${task.priority}">
-                        ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                        ${task.priority.toUpperCase()}
                     </span>
                     <div class="task-category">${task.category || 'Uncategorized'}</div>
                 </div>
@@ -155,18 +155,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
             <div class="task-actions">
-                <button class="task-action-btn" onclick="updateTaskStatus('${task.id}')">
+                <button type="button" class="task-action-btn status-btn" data-task-id="${task.id}">
                     <i class="fas fa-sync-alt"></i>
                 </button>
-                <button class="task-action-btn" onclick="editTask('${task.id}')">
+                <button type="button" class="task-action-btn edit-btn" data-task-id="${task.id}">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="task-action-btn" onclick="deleteTask('${task.id}')">
+                <button type="button" class="task-action-btn delete-btn" data-task-id="${task.id}">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
         `;
-        
+
+        // Add event listeners to buttons
+        const statusBtn = div.querySelector('.status-btn');
+        const editBtn = div.querySelector('.edit-btn');
+        const deleteBtn = div.querySelector('.delete-btn');
+
+        statusBtn.addEventListener('click', () => updateTaskStatus(task.id));
+        editBtn.addEventListener('click', () => editTask(task.id));
+        deleteBtn.addEventListener('click', () => deleteTask(task.id));
+
         return div;
     }
 
