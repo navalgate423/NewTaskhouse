@@ -628,6 +628,111 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Call initialize
     initializeEnhancements();
+
+    // Attendance Modal Functions
+    function toggleAttendanceModal() {
+        const modal = document.getElementById('attendanceModal');
+        if (modal) {
+            modal.classList.toggle('show');
+            updateCurrentTime();
+        }
+    }
+
+    function updateCurrentTime() {
+        const timeElement = document.getElementById('currentTime');
+        const dateElement = document.getElementById('currentDate');
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        const dateString = now.toLocaleDateString(undefined, { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        
+        timeElement.textContent = timeString;
+        dateElement.textContent = dateString;
+    }
+
+    function closeAttendanceModal() {
+        const modal = document.getElementById('attendanceModal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+    }
+
+    // Clock In/Out Functions
+    function clockIn() {
+        const now = new Date();
+        const record = {
+            type: 'Clock In',
+            time: now.toLocaleTimeString(),
+            date: now.toLocaleDateString()
+        };
+        
+        saveAttendanceRecord(record);
+        updateRecords();
+        document.getElementById('clockInBtn').disabled = true;
+        document.getElementById('clockOutBtn').disabled = false;
+    }
+
+    function clockOut() {
+        const now = new Date();
+        const record = {
+            type: 'Clock Out',
+            time: now.toLocaleTimeString(),
+            date: now.toLocaleDateString()
+        };
+        
+        saveAttendanceRecord(record);
+        updateRecords();
+        document.getElementById('clockInBtn').disabled = false;
+        document.getElementById('clockOutBtn').disabled = true;
+    }
+
+    // Save and Update Records
+    function saveAttendanceRecord(record) {
+        let records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
+        records.push(record);
+        localStorage.setItem('attendanceRecords', JSON.stringify(records));
+    }
+
+    function updateRecords() {
+        const recordsContainer = document.getElementById('todayRecords');
+        const records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
+        const today = new Date().toLocaleDateString();
+        
+        const todayRecords = records.filter(record => record.date === today);
+        
+        recordsContainer.innerHTML = todayRecords.map(record => `
+            <div class="record-item">
+                <span class="record-type">${record.type}</span>
+                <span class="record-time">${record.time}</span>
+            </div>
+        `).join('');
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update time every second
+        setInterval(updateCurrentTime, 1000);
+        
+        // Check if already clocked in today
+        const records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
+        const today = new Date().toLocaleDateString();
+        const todayRecords = records.filter(record => record.date === today);
+        
+        const lastRecord = todayRecords[todayRecords.length - 1];
+        if (lastRecord) {
+            document.getElementById('clockInBtn').disabled = lastRecord.type === 'Clock In';
+            document.getElementById('clockOutBtn').disabled = lastRecord.type === 'Clock Out';
+        } else {
+            document.getElementById('clockOutBtn').disabled = true;
+        }
+        
+        updateRecords();
+    });
 });
 
 const styles = `

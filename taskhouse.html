@@ -69,6 +69,9 @@
                 <input type="text" placeholder="Search...">
             </div>
             <div class="user-menu">
+                <div class="attendance-icon" onclick="toggleAttendanceModal()">
+                    <i class="fas fa-clock"></i>
+                </div>
                 <div class="notifications">
                     <i class="fas fa-bell"></i>
                     <span class="notification-badge">3</span>
@@ -528,6 +531,36 @@
             <div class="delete-modal-footer">
                 <button class="btn-cancel-delete">Cancel</button>
                 <button class="btn-confirm-delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Modal -->
+    <div class="attendance-modal" id="attendanceModal">
+        <div class="attendance-content">
+            <div class="attendance-header">
+                <h3>Attendance</h3>
+                <button class="close-attendance" onclick="closeAttendanceModal()">×</button>
+            </div>
+            <div class="attendance-body">
+                <div class="current-time">
+                    <span id="currentTime"></span>
+                    <span id="currentDate"></span>
+                </div>
+                <div class="attendance-actions">
+                    <button id="clockInBtn" class="clock-btn" onclick="clockIn()">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Clock In
+                    </button>
+                    <button id="clockOutBtn" class="clock-btn" onclick="clockOut()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Clock Out
+                    </button>
+                </div>
+                <div class="attendance-records">
+                    <h4>Today's Records</h4>
+                    <div id="todayRecords"></div>
+                </div>
             </div>
         </div>
     </div>

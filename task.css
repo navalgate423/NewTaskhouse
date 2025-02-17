@@ -3274,3 +3274,183 @@ textarea.form-control {
 .btn-confirm-delete:hover {
     background: #dc2626;
 }
+
+/* Clock Icon in Top Bar */
+.top-bar .user-menu {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.attendance-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 8px;
+    color: #64748b;
+    transition: color 0.2s;
+    z-index: 1;
+}
+
+.attendance-icon i {
+    font-size: 18px;
+    pointer-events: none; /* This ensures the icon doesn't interfere with clicks */
+}
+
+.attendance-icon:hover {
+    color: var(--primary);
+}
+
+/* Attendance Icon */
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.attendance-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 8px;
+    color: #64748b;
+    transition: color 0.2s;
+    z-index: 1;
+}
+
+.attendance-icon i {
+    font-size: 18px;
+    pointer-events: none;
+}
+
+.attendance-icon:hover {
+    color: var(--primary);
+}
+
+/* Attendance Modal */
+.attendance-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1100;
+}
+
+.attendance-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.attendance-content {
+    background: white;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.attendance-header {
+    padding: 16px;
+    background: var(--primary);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.attendance-body {
+    padding: 20px;
+}
+
+.current-time {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#currentTime {
+    display: block;
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+#currentDate {
+    display: block;
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.attendance-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.clock-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.clock-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#clockInBtn {
+    background: #22c55e;
+    color: white;
+}
+
+#clockOutBtn {
+    background: #ef4444;
+    color: white;
+}
+
+.attendance-records {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 20px;
+}
+
+.record-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 14px;
+}
+
+.record-type {
+    color: #64748b;
+}
+
+.record-time {
+    font-weight: 500;
+}
+
+@media (max-width: 640px) {
+    .attendance-content {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .attendance-actions {
+        flex-direction: column;
+    }
+}
