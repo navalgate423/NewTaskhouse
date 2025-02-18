@@ -69,7 +69,7 @@
                 <input type="text" placeholder="Search...">
             </div>
             <div class="user-menu">
-                <div class="attendance-icon" onclick="toggleAttendanceModal()">
+                <div class="attendance-icon">
                     <i class="fas fa-clock"></i>
                 </div>
                 <div class="notifications">
@@ -539,27 +539,95 @@
     <div class="attendance-modal" id="attendanceModal">
         <div class="attendance-content">
             <div class="attendance-header">
-                <h3>Attendance</h3>
-                <button class="close-attendance" onclick="closeAttendanceModal()">×</button>
+                <div class="header-title">
+                    <i class="fas fa-calendar-check"></i>
+                    <h3>ATTENDANCE</h3>
+                </div>
+                <button class="close-attendance">×</button>
             </div>
             <div class="attendance-body">
-                <div class="current-time">
-                    <span id="currentTime"></span>
-                    <span id="currentDate"></span>
+                <div class="date-info">
+                    <div class="date-range">
+                        DATE: <span id="dateRangeText">January 28, 2025 - February 28, 2025</span>
+                    </div>
+                    <div class="current-time-display">
+                        <div class="time" id="realTimeClock">00:00:00</div>
+                        <div class="date" id="currentDateTime">Feb 19, 2025</div>
+                    </div>
+                    <select id="dateFilter" class="date-filter">
+                        <option>Jan 27, 2025 => Feb 27, 2025</option>
+                    </select>
                 </div>
+                
+                <div class="attendance-table-wrapper">
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Day</th>
+                                <th colspan="2">Schedule</th>
+                                <th>Break</th>
+                                <th colspan="2">Attendance</th>
+                                <th>Tardiness</th>
+                                <th>Undertime</th>
+                                <th>Break</th>
+                                <th>Worked Hours</th>
+                                <th>Excess Hours</th>
+                                <th>Action</th>
+                            </tr>
+                            <tr class="sub-header">
+                                <th></th>
+                                <th></th>
+                                <th>In</th>
+                                <th>Out</th>
+                                <th></th>
+                                <th>In</th>
+                                <th>Out</th>
+                                <th colspan="6"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody">
+                            <!-- Records will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="attendance-legend">
+                    <div class="legend-item">
+                        <span class="legend-color pending"></span>
+                        Pending
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color approved"></span>
+                        Approved
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color declined"></span>
+                        Declined
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color leave"></span>
+                        Leave
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color overtime"></span>
+                        Overtime
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color schedule-change"></span>
+                        Change Schedule
+                    </div>
+                </div>
+
                 <div class="attendance-actions">
-                    <button id="clockInBtn" class="clock-btn" onclick="clockIn()">
+                    <button id="clockInBtn" class="clock-btn clock-in">
                         <i class="fas fa-sign-in-alt"></i>
                         Clock In
                     </button>
-                    <button id="clockOutBtn" class="clock-btn" onclick="clockOut()">
+                    <button id="clockOutBtn" class="clock-btn clock-out">
                         <i class="fas fa-sign-out-alt"></i>
                         Clock Out
                     </button>
-                </div>
-                <div class="attendance-records">
-                    <h4>Today's Records</h4>
-                    <div id="todayRecords"></div>
                 </div>
             </div>
         </div>

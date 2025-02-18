@@ -120,7 +120,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         myTasksContainer.innerHTML = '';
         tasks.forEach(task => {
-            const taskElement = createTaskElement(task);
+            // Convert the string to a DOM element before appending
+            const taskHTML = createTaskElement(task);
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = taskHTML;
+            const taskElement = tempDiv.firstElementChild;
             myTasksContainer.appendChild(taskElement);
         });
 
@@ -129,60 +133,45 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to create task element
     function createTaskElement(task) {
-        const div = document.createElement('div');
-        div.className = `task-card ${task.status}`;
-        div.dataset.taskId = task.id;
-        
-        div.innerHTML = `
-            <div class="task-content">
+        const dueDate = new Date(task.dueDate);
+        return `
+            <div class="task-card" data-task-id="${task.id}">
                 <div class="task-header">
-                    <span class="task-priority ${task.priority}">
-                        ${task.priority.toUpperCase()}
-                    </span>
-                    <div class="task-category">${task.category || 'Uncategorized'}</div>
+                    <h3>${task.title}</h3>
+                    <div class="task-priority">
+                        <i class="fas fa-flag ${task.priority}"></i>
+                    </div>
                 </div>
-                <h3 class="task-title">${task.title}</h3>
-                <p class="task-description">${task.description || 'No description'}</p>
+                <p>${task.description}</p>
                 <div class="task-meta">
-                    <div class="task-due-date">
-                        <i class="far fa-calendar"></i>
-                        <span>${formatDate(task.dueDate)}</span>
-                    </div>
-                    <div class="task-status">
-                        <i class="fas fa-circle"></i>
-                        <span>${task.status}</span>
-                    </div>
+                    <span class="due-date">Due: ${dueDate.toLocaleDateString()}</span>
+                    <span class="category">${task.category || 'No Category'}</span>
                 </div>
-            </div>
-            <div class="task-actions">
-                <button type="button" class="task-action-btn status-btn" data-task-id="${task.id}">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-                <button type="button" class="task-action-btn edit-btn" data-task-id="${task.id}">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button type="button" class="task-action-btn delete-btn" data-task-id="${task.id}">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="task-actions">
+                    <button onclick="updateTaskStatus('${task.id}')" class="status-btn ${task.status}">
+                        ${task.status.replace('-', ' ')}
+                    </button>
+                    <button onclick="editTask('${task.id}')" class="edit-btn">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteTask('${task.id}')" class="delete-btn">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </div>
         `;
-
-        // Add event listeners to buttons
-        const statusBtn = div.querySelector('.status-btn');
-        const editBtn = div.querySelector('.edit-btn');
-        const deleteBtn = div.querySelector('.delete-btn');
-
-        statusBtn.addEventListener('click', () => updateTaskStatus(task.id));
-        editBtn.addEventListener('click', () => editTask(task.id));
-        deleteBtn.addEventListener('click', () => deleteTask(task.id));
-
-        return div;
     }
 
     // Date formatter
-    function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'short', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString(undefined, options);
+    function formatDate(date) {
+        if (!(date instanceof Date)) {
+            date = new Date(date);
+        }
+        return date.toLocaleDateString('en-US', {
+            month: 'long',
+            day: '2-digit',
+            year: 'numeric'
+        });
     }
 
     // Add event listeners for filters and search
@@ -339,8 +328,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const notification = document.createElement('div');
         notification.className = 'notification';
         notification.textContent = message;
+        
+        // Style the notification
+        Object.assign(notification.style, {
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            padding: '12px 24px',
+            background: '#22c55e',
+            color: 'white',
+            borderRadius: '4px',
+            zIndex: '9999',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        });
+        
         document.body.appendChild(notification);
         
+        // Remove after 3 seconds
         setTimeout(() => {
             notification.remove();
         }, 3000);
@@ -629,52 +633,98 @@ document.addEventListener('DOMContentLoaded', function() {
     // Call initialize
     initializeEnhancements();
 
-    // Attendance Modal Functions
+    // Attendance functionality
+    let workStartTime = null;
+    let workTimer = null;
+
     function toggleAttendanceModal() {
         const modal = document.getElementById('attendanceModal');
         if (modal) {
             modal.classList.toggle('show');
-            updateCurrentTime();
+            updateDateTime();
+            updateRecords();
         }
     }
 
-    function updateCurrentTime() {
-        const timeElement = document.getElementById('currentTime');
-        const dateElement = document.getElementById('currentDate');
-        
+    function updateDateTime() {
         const now = new Date();
-        const timeString = now.toLocaleTimeString();
-        const dateString = now.toLocaleDateString(undefined, { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        });
+        const dateTimeElement = document.getElementById('currentDateTime');
+        const dateRangeElement = document.getElementById('dateRangeText');
         
-        timeElement.textContent = timeString;
-        dateElement.textContent = dateString;
-    }
-
-    function closeAttendanceModal() {
-        const modal = document.getElementById('attendanceModal');
-        if (modal) {
-            modal.classList.remove('show');
+        if (dateTimeElement) {
+            dateTimeElement.textContent = formatDateTime(now);
+        }
+        
+        if (dateRangeElement) {
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            dateRangeElement.textContent = `${formatDate(monthStart)} - ${formatDate(monthEnd)}`;
         }
     }
 
-    // Clock In/Out Functions
+    function updateRealTimeClock() {
+        const now = new Date();
+        const timeElement = document.getElementById('realTimeClock');
+        if (timeElement) {
+            timeElement.textContent = now.toLocaleTimeString('en-US', {
+                hour12: true,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+    }
+
+    // Initialize clock and attendance functions
+    document.addEventListener('DOMContentLoaded', function() {
+        // Start real-time clock
+        updateRealTimeClock();
+        setInterval(updateRealTimeClock, 1000);
+        
+        // Add click event listeners to clock buttons
+        const clockInBtn = document.getElementById('clockInBtn');
+        const clockOutBtn = document.getElementById('clockOutBtn');
+        
+        if (clockInBtn) {
+            clockInBtn.onclick = function() {
+                clockIn();
+            };
+        }
+        
+        if (clockOutBtn) {
+            clockOutBtn.onclick = function() {
+                clockOut();
+            };
+        }
+        
+        // Initial check of clock status
+        checkClockStatus();
+        updateRecords();
+    });
+
     function clockIn() {
         const now = new Date();
         const record = {
             type: 'Clock In',
             time: now.toLocaleTimeString(),
-            date: now.toLocaleDateString()
+            date: now.toLocaleDateString(),
+            timestamp: now.getTime()
         };
         
-        saveAttendanceRecord(record);
+        // Save to localStorage
+        let records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
+        records.push(record);
+        localStorage.setItem('attendanceRecords', JSON.stringify(records));
+        
+        // Update UI
+        const clockInBtn = document.getElementById('clockInBtn');
+        const clockOutBtn = document.getElementById('clockOutBtn');
+        if (clockInBtn) clockInBtn.disabled = true;
+        if (clockOutBtn) clockOutBtn.disabled = false;
+        
+        // Update table
         updateRecords();
-        document.getElementById('clockInBtn').disabled = true;
-        document.getElementById('clockOutBtn').disabled = false;
+        showNotification('Clocked in successfully!');
     }
 
     function clockOut() {
@@ -682,57 +732,249 @@ document.addEventListener('DOMContentLoaded', function() {
         const record = {
             type: 'Clock Out',
             time: now.toLocaleTimeString(),
-            date: now.toLocaleDateString()
+            date: now.toLocaleDateString(),
+            timestamp: now.getTime()
         };
         
-        saveAttendanceRecord(record);
-        updateRecords();
-        document.getElementById('clockInBtn').disabled = false;
-        document.getElementById('clockOutBtn').disabled = true;
-    }
-
-    // Save and Update Records
-    function saveAttendanceRecord(record) {
+        // Save to localStorage
         let records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
         records.push(record);
         localStorage.setItem('attendanceRecords', JSON.stringify(records));
+        
+        // Update UI
+        const clockInBtn = document.getElementById('clockInBtn');
+        const clockOutBtn = document.getElementById('clockOutBtn');
+        if (clockInBtn) clockInBtn.disabled = false;
+        if (clockOutBtn) clockOutBtn.disabled = true;
+        
+        // Update table
+        updateRecords();
+        showNotification('Clocked out successfully!');
+    }
+
+    function checkClockStatus() {
+        const records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
+        const today = new Date().toLocaleDateString();
+        const todayRecords = records.filter(record => record.date === today);
+        
+        if (todayRecords.length > 0) {
+            const lastRecord = todayRecords[todayRecords.length - 1];
+            const isClockedIn = lastRecord.type === 'Clock In';
+            
+            const clockInBtn = document.getElementById('clockInBtn');
+            const clockOutBtn = document.getElementById('clockOutBtn');
+            
+            if (clockInBtn) clockInBtn.disabled = isClockedIn;
+            if (clockOutBtn) clockOutBtn.disabled = !isClockedIn;
+        }
     }
 
     function updateRecords() {
-        const recordsContainer = document.getElementById('todayRecords');
+        const tableBody = document.getElementById('attendanceTableBody');
         const records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
-        const today = new Date().toLocaleDateString();
+        const days = generateWeekSchedule(new Date());
         
-        const todayRecords = records.filter(record => record.date === today);
+        tableBody.innerHTML = days.map((day, index) => {
+            const dayRecords = records.filter(r => r.date === day.date);
+            const clockIn = dayRecords.find(r => r.type === 'Clock In');
+            const clockOut = dayRecords.find(r => r.type === 'Clock Out');
+            
+            const metrics = calculateAttendanceMetrics(dayRecords);
+            
+            return `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${day.dayName}</td>
+                    <td>${day.scheduleIn}</td>
+                    <td>${day.scheduleOut}</td>
+                    <td>${day.break}</td>
+                    <td>${clockIn ? clockIn.time : ''}</td>
+                    <td>${clockOut ? clockOut.time : ''}</td>
+                    <td>${formatDuration(metrics.tardiness)}</td>
+                    <td>${formatDuration(metrics.undertime)}</td>
+                    <td>${formatDuration(metrics.breakDuration)}</td>
+                    <td>${formatDuration(metrics.workHours)}</td>
+                    <td>${formatDuration(metrics.excess)}</td>
+                    <td class="action-cell">
+                        <button class="action-btn">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function calculateAttendanceMetrics(records) {
+        const workStart = '10:00 PM'; // Expected start time
+        const workHoursRequired = 9 * 60; // 9 hours in minutes
         
-        recordsContainer.innerHTML = todayRecords.map(record => `
-            <div class="record-item">
-                <span class="record-type">${record.type}</span>
-                <span class="record-time">${record.time}</span>
-            </div>
-        `).join('');
+        let metrics = {
+            clockIn: records.find(r => r.type === 'Clock In')?.time || null,
+            clockOut: records.find(r => r.type === 'Clock Out')?.time || null,
+            workHours: 0,
+            breakDuration: 60, // Default 1 hour break
+            tardiness: 0,
+            undertime: 0,
+            excess: 0
+        };
+        
+        if (metrics.clockIn && metrics.clockOut) {
+            const clockInTime = parseTime(metrics.clockIn);
+            const clockOutTime = parseTime(metrics.clockOut);
+            const expectedStartTime = parseTime(workStart);
+            
+            // Calculate tardiness
+            if (clockInTime > expectedStartTime) {
+                metrics.tardiness = clockInTime - expectedStartTime;
+            }
+            
+            // Calculate total work hours
+            let totalMinutes = clockOutTime - clockInTime - metrics.breakDuration;
+            metrics.workHours = totalMinutes;
+            
+            // Calculate undertime/excess
+            if (totalMinutes < workHoursRequired) {
+                metrics.undertime = workHoursRequired - totalMinutes;
+            } else {
+                metrics.excess = totalMinutes - workHoursRequired;
+            }
+        }
+        
+        return metrics;
+    }
+
+    function parseTime(timeString) {
+        const [time, period] = timeString.split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+        
+        if (period === 'PM' && hours !== 12) hours += 12;
+        if (period === 'AM' && hours === 12) hours = 0;
+        
+        return hours * 60 + minutes;
+    }
+
+    function formatDuration(minutes) {
+        if (!minutes) return '-';
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        return `${hours}h ${mins}m`;
+    }
+
+    function formatDateTime(date) {
+        return date.toLocaleString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    }
+
+    function generateWeekSchedule(startDate) {
+        const days = [];
+        const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        
+        for (let i = 0; i < 7; i++) {
+            const currentDate = new Date(startDate);
+            currentDate.setDate(startDate.getDate() + i);
+            
+            days.push({
+                dayName: dayNames[currentDate.getDay()],
+                date: currentDate.toLocaleDateString(),
+                scheduleIn: '10:00 PM',
+                scheduleOut: '7:00 AM',
+                break: '1:0'
+            });
+        }
+        
+        return days;
     }
 
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
         // Update time every second
-        setInterval(updateCurrentTime, 1000);
+        setInterval(updateDateTime, 1000);
         
-        // Check if already clocked in today
-        const records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
-        const today = new Date().toLocaleDateString();
-        const todayRecords = records.filter(record => record.date === today);
+        // Check if already clocked in
+        checkClockStatus();
         
-        const lastRecord = todayRecords[todayRecords.length - 1];
-        if (lastRecord) {
-            document.getElementById('clockInBtn').disabled = lastRecord.type === 'Clock In';
-            document.getElementById('clockOutBtn').disabled = lastRecord.type === 'Clock Out';
-        } else {
-            document.getElementById('clockOutBtn').disabled = true;
-        }
-        
+        // Initial records update
         updateRecords();
     });
+
+    const attendanceIcon = document.querySelector('.attendance-icon');
+    if (attendanceIcon) {
+        attendanceIcon.addEventListener('click', function() {
+            const modal = document.getElementById('attendanceModal');
+            if (modal) {
+                modal.classList.toggle('show');
+                updateDateTime();
+            }
+        });
+    }
+
+    // Add close button handler
+    const closeBtn = document.querySelector('.close-attendance');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            const modal = document.getElementById('attendanceModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        });
+    }
+
+    // Close when clicking outside the modal
+    const modal = document.getElementById('attendanceModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+            }
+        });
+    }
+
+    // Attendance Table Functions
+    function initializeAttendance() {
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        populateAttendanceTable();
+    }
+
+    function populateAttendanceTable() {
+        const tableBody = document.getElementById('attendanceTableBody');
+        const currentDate = new Date();
+        const days = generateWeekSchedule(currentDate);
+        
+        tableBody.innerHTML = days.map((day, index) => `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${day.dayName}</td>
+                <td>${day.scheduleIn}</td>
+                <td>${day.scheduleOut}</td>
+                <td>${day.break || '1:0'}</td>
+                <td>${day.attendanceIn || ''}</td>
+                <td>${day.attendanceOut || ''}</td>
+                <td>${day.tardiness || ''}</td>
+                <td>${day.undertime || ''}</td>
+                <td>${day.break || ''}</td>
+                <td>${day.workedHours || ''}</td>
+                <td>${day.excessHours || ''}</td>
+                <td class="action-cell">
+                    <button class="action-btn" onclick="showActionMenu(${index})">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function showActionMenu(index) {
+        // Implement action menu functionality
+        console.log('Show action menu for row:', index);
+    }
 });
 
 const styles = `
