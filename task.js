@@ -1,4 +1,8 @@
+console.log('Script loaded'); // Check if script is loading
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded'); // Check if DOM is ready
+    
     // Initialize tasks array from localStorage
     let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
@@ -324,30 +328,27 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // Notification system
-    function showNotification(message) {
+    function showNotification(message, type = 'success') {
         const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.textContent = message;
+        notification.className = `notification ${type}`;
         
-        // Style the notification
-        Object.assign(notification.style, {
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            padding: '12px 24px',
-            background: '#22c55e',
-            color: 'white',
-            borderRadius: '4px',
-            zIndex: '9999',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        });
+        // Add icon based on type
+        const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
+        
+        notification.innerHTML = `
+            <i class="fas fa-${icon}"></i>
+            <span>${message}</span>
+        `;
         
         document.body.appendChild(notification);
         
-        // Remove after 3 seconds
+        // Animate out after 2 seconds
         setTimeout(() => {
-            notification.remove();
-        }, 3000);
+            notification.style.animation = 'fadeOut 0.3s ease-out forwards';
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 2000);
     }
 
     // Task statistics
@@ -637,14 +638,45 @@ document.addEventListener('DOMContentLoaded', function() {
     let workStartTime = null;
     let workTimer = null;
 
-    function toggleAttendanceModal() {
+    // Initialize attendance modal buttons
+    function initializeAttendanceButtons() {
+        console.log('Initializing attendance buttons');
+        const clockInBtn = document.getElementById('clockInBtn');
+        const clockOutBtn = document.getElementById('clockOutBtn');
+        
+        if (clockInBtn) {
+            console.log('Found Clock In button');
+            clockInBtn.onclick = function() {
+                console.log('Clock In clicked');
+                clockIn();
+            };
+        } else {
+            console.log('Clock In button not found');
+        }
+        
+        if (clockOutBtn) {
+            clockOutBtn.onclick = function() {
+                console.log('Clock Out clicked');
+                clockOut();
+            };
+        }
+    }
+
+    // Update toggleAttendanceModal function
+    window.toggleAttendanceModal = function() {
+        console.log('Toggle modal called');
         const modal = document.getElementById('attendanceModal');
         if (modal) {
             modal.classList.toggle('show');
             updateDateTime();
             updateRecords();
+            // Initialize buttons after modal is shown
+            setTimeout(initializeAttendanceButtons, 100);
         }
-    }
+    };
+
+    // Initialize buttons on page load as well
+    initializeAttendanceButtons();
 
     function updateDateTime() {
         const now = new Date();
@@ -665,45 +697,53 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateRealTimeClock() {
         const now = new Date();
         const timeElement = document.getElementById('realTimeClock');
+        const dateElement = document.getElementById('currentDateTime');
+        
         if (timeElement) {
+            // Update time in HH:MM:SS format
             timeElement.textContent = now.toLocaleTimeString('en-US', {
-                hour12: true,
+                hour12: false,
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit'
             });
         }
+        
+        if (dateElement) {
+            // Update date
+            dateElement.textContent = now.toLocaleDateString('en-US', {
+                month: 'short',
+                day: '2-digit',
+                year: 'numeric'
+            });
+        }
     }
 
-    // Initialize clock and attendance functions
+    // Start the clock when the document loads
     document.addEventListener('DOMContentLoaded', function() {
-        // Start real-time clock
+        // Initial update
         updateRealTimeClock();
+        
+        // Update every second
         setInterval(updateRealTimeClock, 1000);
-        
-        // Add click event listeners to clock buttons
-        const clockInBtn = document.getElementById('clockInBtn');
-        const clockOutBtn = document.getElementById('clockOutBtn');
-        
-        if (clockInBtn) {
-            clockInBtn.onclick = function() {
-                clockIn();
-            };
-        }
-        
-        if (clockOutBtn) {
-            clockOutBtn.onclick = function() {
-                clockOut();
-            };
-        }
-        
-        // Initial check of clock status
-        checkClockStatus();
-        updateRecords();
     });
 
     function clockIn() {
         const now = new Date();
+        const lastClockOut = localStorage.getItem('lastClockOut');
+        
+        if (lastClockOut) {
+            const lastClockOutDate = new Date(parseInt(lastClockOut));
+            const nextAvailableDate = new Date(lastClockOutDate);
+            nextAvailableDate.setHours(0, 0, 0, 0);
+            nextAvailableDate.setDate(nextAvailableDate.getDate() + 1);
+            
+            if (now < nextAvailableDate) {
+                showNotification('You can only clock in again tomorrow', 'error');
+                return;
+            }
+        }
+        
         const record = {
             type: 'Clock In',
             time: now.toLocaleTimeString(),
@@ -724,7 +764,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update table
         updateRecords();
-        showNotification('Clocked in successfully!');
+        showNotification('You have successfully clocked in!');
     }
 
     function clockOut() {
@@ -741,20 +781,39 @@ document.addEventListener('DOMContentLoaded', function() {
         records.push(record);
         localStorage.setItem('attendanceRecords', JSON.stringify(records));
         
+        // Save last clock out time
+        localStorage.setItem('lastClockOut', now.getTime().toString());
+        
         // Update UI
         const clockInBtn = document.getElementById('clockInBtn');
         const clockOutBtn = document.getElementById('clockOutBtn');
-        if (clockInBtn) clockInBtn.disabled = false;
+        if (clockInBtn) clockInBtn.disabled = true;
         if (clockOutBtn) clockOutBtn.disabled = true;
         
         // Update table
         updateRecords();
-        showNotification('Clocked out successfully!');
+        showNotification('You have successfully clocked out!');
     }
 
     function checkClockStatus() {
         const records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
         const today = new Date().toLocaleDateString();
+        const lastClockOut = localStorage.getItem('lastClockOut');
+        
+        if (lastClockOut) {
+            const lastClockOutDate = new Date(parseInt(lastClockOut));
+            const nextAvailableDate = new Date(lastClockOutDate);
+            nextAvailableDate.setHours(0, 0, 0, 0);
+            nextAvailableDate.setDate(nextAvailableDate.getDate() + 1);
+            
+            const now = new Date();
+            if (now < nextAvailableDate) {
+                const clockInBtn = document.getElementById('clockInBtn');
+                if (clockInBtn) clockInBtn.disabled = true;
+                return;
+            }
+        }
+        
         const todayRecords = records.filter(record => record.date === today);
         
         if (todayRecords.length > 0) {
