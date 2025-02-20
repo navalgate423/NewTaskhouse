@@ -1034,6 +1034,108 @@ document.addEventListener('DOMContentLoaded', function() {
         // Implement action menu functionality
         console.log('Show action menu for row:', index);
     }
+
+    // Delete Modal Functionality
+    function showDeleteModal(taskId) {
+        const modal = document.getElementById('deleteModal');
+        if (modal) {
+            modal.dataset.taskId = taskId;
+            modal.classList.add('show');
+        }
+    }
+
+    function hideDeleteModal() {
+        const modal = document.getElementById('deleteModal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+    }
+
+    function confirmDelete() {
+        const modal = document.getElementById('deleteModal');
+        const taskId = modal.dataset.taskId;
+        
+        if (taskId) {
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks = tasks.filter(task => task.id !== taskId);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            
+            hideDeleteModal();
+            loadMyTasks(); // Refresh the task list
+        }
+    }
+
+    // Update Task Functionality
+    function showUpdateModal(taskId) {
+        const modal = document.getElementById('updateModal');
+        const task = findTaskById(taskId);
+        
+        if (modal && task) {
+            // Fill the form with task data
+            document.getElementById('updateTitle').value = task.title;
+            document.getElementById('updateDescription').value = task.description;
+            document.getElementById('updateDueDate').value = task.dueDate;
+            document.getElementById('updatePriority').value = task.priority;
+            document.getElementById('updateStatus').value = task.status;
+            
+            modal.dataset.taskId = taskId;
+            modal.classList.add('show');
+        }
+    }
+
+    function hideUpdateModal() {
+        const modal = document.getElementById('updateModal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+    }
+
+    function updateTask() {
+        const modal = document.getElementById('updateModal');
+        const taskId = modal.dataset.taskId;
+        
+        if (taskId) {
+            const updatedTask = {
+                id: taskId,
+                title: document.getElementById('updateTitle').value,
+                description: document.getElementById('updateDescription').value,
+                dueDate: document.getElementById('updateDueDate').value,
+                priority: document.getElementById('updatePriority').value,
+                status: document.getElementById('updateStatus').value
+            };
+            
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks = tasks.map(task => task.id === taskId ? updatedTask : task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            
+            hideUpdateModal();
+            loadMyTasks(); // Refresh the task list
+        }
+    }
+
+    function findTaskById(taskId) {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        return tasks.find(task => task.id === taskId);
+    }
+
+    // Add event listeners when document loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Delete modal listeners
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const taskId = e.target.closest('.task-card').dataset.taskId;
+                showDeleteModal(taskId);
+            });
+        });
+        
+        // Update modal listeners
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const taskId = e.target.closest('.task-card').dataset.taskId;
+                showUpdateModal(taskId);
+            });
+        });
+    });
 });
 
 const styles = `
