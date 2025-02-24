@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
         myTasksContainer.innerHTML = '';
         tasks.forEach(task => {
             // Convert the string to a DOM element before appending
-            const taskHTML = createTaskElement(task);
+            const taskHTML = createTaskCard(task);
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = taskHTML;
             const taskElement = tempDiv.firstElementChild;
@@ -136,31 +136,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Function to create task element
-    function createTaskElement(task) {
-        const dueDate = new Date(task.dueDate);
+    function createTaskCard(task) {
         return `
-            <div class="task-card" data-task-id="${task.id}">
-                <div class="task-header">
-                    <h3>${task.title}</h3>
-                    <div class="task-priority">
-                        <i class="fas fa-flag ${task.priority}"></i>
+            <div class="task-card ${task.priority}" data-task-id="${task.id}">
+                <div class="task-content">
+                    <div class="status-badge">${task.status}</div>
+                    <h3 class="task-title">${task.title}</h3>
+                    <p class="task-description">${task.description}</p>
+                    <div class="task-meta">
+                        <div class="due-date">
+                            <i class="far fa-calendar"></i>
+                            ${task.dueDate}
+                        </div>
+                        <div class="task-actions">
+                            <button class="task-btn edit-btn" onclick="showUpdateModal('${task.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="task-btn delete-btn" onclick="showDeleteModal('${task.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <p>${task.description}</p>
-                <div class="task-meta">
-                    <span class="due-date">Due: ${dueDate.toLocaleDateString()}</span>
-                    <span class="category">${task.category || 'No Category'}</span>
-                </div>
-                <div class="task-actions">
-                    <button onclick="updateTaskStatus('${task.id}')" class="status-btn ${task.status}">
-                        ${task.status.replace('-', ' ')}
-                    </button>
-                    <button onclick="editTask('${task.id}')" class="edit-btn">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="deleteTask('${task.id}')" class="delete-btn">
-                        <i class="fas fa-trash"></i>
-                    </button>
                 </div>
             </div>
         `;
@@ -206,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (taskOverviewContainer) {
             taskOverviewContainer.innerHTML = '';
             tasks.forEach(task => {
-                const taskElement = createTaskElement(task, false);
+                const taskElement = createTaskCard(task, false);
                 taskOverviewContainer.appendChild(taskElement);
             });
         }
